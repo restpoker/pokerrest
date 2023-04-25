@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>REST Point System</title>
+</head>
+<body>
+    <h1>"REST Point System"</h1>
+    <form>
+        <label for="name">メンバー名:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="points">ポイント:</label>
+        <input type="number" id="points" name="points" required>
+        <button type="button" onclick="addMember()">追加</button>
+        <button type="button" onclick="addPoints()">加算</button>
+        <button type="button" onclick="minusPoints()">減算</button>
+        <button type="button" onclick="listMembers()">一覧表示</button>
+    </form>
+    <div id="result"></div>
+    <script>
+        let members = [];
+
+        // ローカルストレージからメンバーデータを読み込む
+        if (localStorage.getItem("members")) {
+            members = JSON.parse(localStorage.getItem("members"));
+        }
+
+        function saveMembers() {
+            // ローカルストレージにメンバーデータを保存する
+            localStorage.setItem("members", JSON.stringify(members));
+        }
+
+        function addMember() {
+            const name = document.getElementById("name").value;
+            const points = parseInt(document.getElementById("points").value);
+            members.push({name: name, points: points});
+            document.getElementById("name").value = "";
+            document.getElementById("points").value = "";
+            document.getElementById("result").innerHTML += `${name}を追加しました<br>`;
+            saveMembers();
+        }
+
+        function addPoints() {
+            const name = document.getElementById("name").value;
+            const points = parseInt(document.getElementById("points").value);
+            const index = members.findIndex(member => member.name === name);
+            if (index !== -1) {
+                members[index].points += points;
+                document.getElementById("result").innerHTML += `${name}に${points}ポイント追加しました<br>`;
+                saveMembers();
+            }
+            document.getElementById("name").value = "";
+            document.getElementById("points").value = "";
+        }
+
+        function minusPoints() {
+            const name = document.getElementById("name").value;
+            const points = parseInt(document.getElementById("points").value);
+            const index = members.findIndex(member => member.name === name);
+            if (index !== -1) {
+                if (members[index].points >= points) {
+                    members[index].points -= points;
+                    document.getElementById("result").innerHTML += `${name}から${points}ポイント減算しました<br>`;
+                    saveMembers();
+                } else {
+                    document.getElementById("result").innerHTML += `${name}のポイントが不足しています<br>`;
+                }
+            }
+            document.getElementById("name").value = "";
+            document.getElementById("points").value = "";
+        }
+
+        function listMembers() {
+            let result = "メンバー一覧:<br>";
+            members.forEach(member => {
+                result += `${member.name}: ${member.points}ポイント<br>`;
+            });
+            document.getElementById("result").innerHTML = result;
+        }
+    </script>
+</body>
+</html>
